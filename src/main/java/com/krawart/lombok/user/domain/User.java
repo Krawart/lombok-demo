@@ -10,6 +10,8 @@ public class User {
      * BOILERPLATE \/
      */
 
+    public User() {}
+
     public User(Long id, String firstName, String lastName, int age) {
         this.id = id;
         this.firstName = firstName;

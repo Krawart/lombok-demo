@@ -6,6 +6,7 @@ import com.krawart.lombok.user.application.exceptions.UserNotFoundException;
 import com.krawart.lombok.user.presentation.v1.models.UserDTO;
 import com.krawart.lombok.user.presentation.v1.models.UserMutationDTO;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final ModelMapper modelMapper;
 
     @Value("${server.address}")
     private String address;
@@ -26,12 +28,17 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable("id") Long id) {
         User user = userService.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return ResponseEntity.ok(UserDTO.of(user));
+
+        UserDTO responseBody = modelMapper.map(user, UserDTO.class);
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping
     public ResponseEntity<Void> createUser(@RequestBody UserMutationDTO user) {
-        User persistedUser = userService.saveUser(user.mapToDomain(null));
+        User userToStore = modelMapper.map(user, User.class);
+
+        User persistedUser = userService.saveUser(userToStore);
+
         return ResponseEntity.created(URI.create(getControllerBaseUrl() + persistedUser.getId())).build();
     }
 
@@ -41,8 +48,13 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id, @RequestBody UserMutationDTO user) {
-        User updatedUser = userService.updateUser(user.mapToDomain(id));
-        return ResponseEntity.ok(UserDTO.of(updatedUser));
+        User userToStore = modelMapper.map(user, User.class);
+        userToStore.setId(id);
+
+        User updatedUser = userService.updateUser(userToStore);
+
+        UserDTO responseBody = modelMapper.map(updatedUser, UserDTO.class);
+        return ResponseEntity.ok(responseBody);
     }
 
     @DeleteMapping("/{id}")

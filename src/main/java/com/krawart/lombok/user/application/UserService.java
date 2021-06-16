@@ -4,6 +4,7 @@ import com.krawart.lombok.user.domain.User;
 import com.krawart.lombok.user.infrastructure.UserEntity;
 import com.krawart.lombok.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,10 +13,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     public User saveUser(User user) {
-        UserEntity persistedUser = userRepository.save(UserEntity.of(user));
-        return persistedUser.mapToDomain();
+        UserEntity userToStore = modelMapper.map(user, UserEntity.class);
+        UserEntity persistedUser = userRepository.save(userToStore);
+        return modelMapper.map(persistedUser, User.class);
     }
 
     public User updateUser(User user) {
@@ -24,7 +27,7 @@ public class UserService {
 
     public Optional<User> findById(Long id) {
         Optional<UserEntity> foundUser = userRepository.findById(id);
-        return foundUser.map(UserEntity::mapToDomain);
+        return foundUser.map(user -> modelMapper.map(user, User.class));
     }
 
     public void deleteUser(Long id) {

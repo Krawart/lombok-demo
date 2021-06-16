@@ -1,6 +1,5 @@
 package com.krawart.lombok.user.infrastructure;
 
-import com.krawart.lombok.user.domain.User;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -23,19 +22,6 @@ public class UserEntity {
     private String firstName;
     private String lastName;
     private int age;
-
-    public static UserEntity of(User user) {
-        return UserEntity.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .age(user.getAge())
-                .build();
-    }
-
-    public User mapToDomain() {
-        return User.builder().id(id).firstName(firstName).lastName(lastName).age(age).build();
-    }
 
     @Override
     public boolean equals(Object o) {
