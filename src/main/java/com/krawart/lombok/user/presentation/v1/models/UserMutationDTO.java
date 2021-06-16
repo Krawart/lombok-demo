@@ -4,12 +4,12 @@ import com.krawart.lombok.user.domain.User;
 import lombok.Data;
 
 @Data
-public class UserUpdateDTO {
+public class UserMutationDTO {
     private String firstName;
     private String lastName;
     private int age;
 
-    public User mapToDomain(long id) {
+    public User mapToDomain(Long id) {
         return User.builder().id(id).firstName(firstName).lastName(lastName).age(age).build();
     }
 }
