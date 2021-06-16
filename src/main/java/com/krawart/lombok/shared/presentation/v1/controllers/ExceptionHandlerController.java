@@ -1,5 +1,6 @@
 package com.krawart.lombok.shared.presentation.v1.controllers;
 
+import com.krawart.lombok.user.application.exceptions.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,5 +20,10 @@ public class ExceptionHandlerController {
 
         String bodyOfResponse = "Oops. Some error occurred. Please contact our support";
         return ResponseEntity.internalServerError().body(bodyOfResponse);
+    }
+
+    @ExceptionHandler(value= {UserNotFoundException.class})
+    protected ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.notFound().build();
     }
 }
